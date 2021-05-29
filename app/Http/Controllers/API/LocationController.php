@@ -47,24 +47,30 @@ class LocationController extends Controller
             'longitude' => 'required|numeric',
             'latitude' => 'required|numeric'
         ]);
+
+        return $request;
         $user = User::find($request->id);
 
         if ($user == null || $user == []) {
             return Response(['message' => "User Not Found"], 401);
         }
 
+
         $location = Location::where('user_id', $request->id);
 
-        if ($location == null || $location == '') {
+        if ($location->count() == 0) {
             $location->create([
-                'longitude' => $request->longitude,
+                'user_id' => $request->id,
                 'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+            ]);
+        } else {
+            $location->update([
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
             ]);
         }
-        $location->update([
-            'longitude' => $request->longitude,
-            'latitude' => $request->latitude,
-        ]);
+
 
         $location = $location->get();
 

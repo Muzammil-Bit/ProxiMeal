@@ -43,6 +43,10 @@ Route::prefix('manager')->group(function () {
     Route::get('settings', 'API\Manager\UserAPIController@settings');
 });
 
+// !!!ADDED BY Muzammil Hussain
+Route::post('location/update', "API\LocationController@store");
+Route::post('location/get', "API\LocationController@show");
+// !!!*************************!!!
 
 Route::post('login', 'API\UserAPIController@login');
 Route::post('register', 'API\UserAPIController@register');
@@ -122,10 +126,4 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('coupons', 'API\CouponAPIController')->except([
         'show'
     ]);
-
-    // !!!ADDED BY Muzammil Hussain
-    // Route::resource('location', 'API\LocationController');
-
-    Route::post('location/update', "API\LocationController@store");
-    Route::post('location/get', "API\LocationController@show");
 });
