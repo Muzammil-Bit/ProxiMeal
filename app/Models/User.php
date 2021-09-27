@@ -18,6 +18,7 @@ use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Spatie\Permission\Traits\HasRoles;
 
+
 /**
  * Class User
  * @package App\Models
