@@ -163,6 +163,12 @@
     </li>
 @endcan
 
+@can('wallets.index')
+    <li class="nav-item">
+        <a class="nav-link {{ Request::is('wallets*') ? 'active' : '' }}" href="{!! route('wallets.index') !!}">@if($icons)<i class="nav-icon fa fa-money"></i>@endif<p>{{trans('Wallets')}} </p></a>
+    </li>
+@endcan
+
 
 @can('faqs.index')
     <li class="nav-item has-treeview {{ Request::is('faqCategories*') || Request::is('faqs*') ? 'menu-open' : '' }}">

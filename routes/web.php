@@ -228,4 +228,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('vehicles', 'VehicleController')->except([
         'show'
     ]);
+
+    Route::resource('wallets', 'WalletController');
 });

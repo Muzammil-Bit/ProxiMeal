@@ -170,7 +170,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
-        Novatree\Wallet\WalletServiceProvider::class
+        // Novatree\Wallet\WalletServiceProvider::class
 
 
 
