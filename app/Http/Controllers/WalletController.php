@@ -3,14 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\DataTables\FaqDataTable;
+use App\DataTables\TransactionsDataTable;
 use App\DataTables\WalletDataTable;
+use App\Models\User;
+use App\Transaction;
 
 class WalletController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the Faq.
      *
-     * @return \Illuminate\Http\Response
+     * @param WalletDataTable $walletDataTable
+     * @return Response
      */
     public function index(WalletDataTable $walletDataTable)
     {
@@ -25,7 +30,11 @@ class WalletController extends Controller
      */
     public function create()
     {
-        //
+        $users = User::whereHas('roles', function ($q) {
+            $q->where('name', 'client');
+        })->get();
+
+        return view('wallets.create', compact('users'));
     }
 
     /**
@@ -36,7 +45,40 @@ class WalletController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'type' => 'required|starts_with:minus,plus',
+            'value' => 'required|integer|min:1',
+        ]);
+        $value = $request->value;
+        $user_id = $request->user_id;
+
+        if ($request->type == "minus") {
+            if ($value > Transaction::where('user_id', $user_id)->sum('value')) {
+                return back()->with('flash', flash("User Does not have engough credit."));
+            }
+            $value = -$value;
+        }
+
+        $tranasction = new Transaction();
+        $tranasction->user_id = $user_id;
+        $tranasction->value = $value;
+        $tranasction->description = $request->description;
+
+
+        if ($tranasction->save()) {
+            return back()->with('flash', flash("Transaction Addedd Successfully"));
+        }
+
+        throw new \Exception();
+    }
+
+
+
+    public function userTransactions(User $user)
+    {
+        $transactionData = new TransactionsDataTable($user);
+        return $transactionData->render('wallets.index', $user);
     }
 
     /**

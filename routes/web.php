@@ -230,4 +230,5 @@ Route::middleware('auth')->group(function () {
     ]);
 
     Route::resource('wallets', 'WalletController');
+    Route::get('wallets/{user_id}/transaction', 'WalletController@userTransactions')->name('wallets.user.transactions');
 });

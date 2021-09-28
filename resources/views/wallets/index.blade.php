@@ -12,9 +12,9 @@
       <div class="col-sm-6">
         <ol class="breadcrumb float-sm-right">
           <li class="breadcrumb-item"><a href="{{url('/dashboard')}}"><i class="fa fa-dashboard"></i> {{trans('lang.dashboard')}}</a></li>
-          <li class="breadcrumb-item"><a href="{!! route('faqs.index') !!}">{{trans('lang.faq_plural')}}</a>
+          <li class="breadcrumb-item"><a href="{!! route('wallets.index') !!}">{{trans('Wallets')}}</a>
           </li>
-          <li class="breadcrumb-item active">{{trans('lang.faq_table')}}</li>
+          <li class="breadcrumb-item active">{{trans('Wallets list')}}</li>
         </ol>
       </div><!-- /.col -->
     </div><!-- /.row -->
@@ -22,7 +22,7 @@
 </div>
 <!-- /.content-header -->
 
-{{-- <div class="content">
+<div class="content">
   <div class="clearfix"></div>
   @include('flash::message')
   <div class="card">
@@ -33,7 +33,7 @@
         </li>
         @can('faqs.create')
         <li class="nav-item">
-          <a class="nav-link" href="{!! route('faqs.create') !!}"><i class="fa fa-plus mr-2"></i>{{trans('lang.faq_create')}}</a>
+          <a class="nav-link" href="{!! route('wallets.create') !!}"><i class="fa fa-plus mr-2"></i>{{trans('Create Transaction')}}</a>
         </li>
         @endcan
         @include('layouts.right_toolbar', compact('dataTable'))
@@ -44,5 +44,5 @@
       <div class="clearfix"></div>
     </div>
   </div>
-</div> --}}
+</div>
 @endsection

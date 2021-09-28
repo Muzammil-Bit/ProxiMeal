@@ -2,14 +2,13 @@
 
 namespace App\DataTables;
 
-// use App\Models\Faq;
-// use App\Models\CustomField;
+use App\Models\User;
 use App\Transaction;
 use Yajra\DataTables\Services\DataTable;
 use Yajra\DataTables\EloquentDataTable;
 use Barryvdh\DomPDF\Facade as PDF;
 
-class WalletDataTable extends DataTable
+class TransactionsDataTable extends DataTable
 {
     /**
      * custom fields columns
@@ -28,10 +27,13 @@ class WalletDataTable extends DataTable
         $dataTable = new EloquentDataTable($query);
         $columns = array_column($this->getColumns(), 'data');
         $dataTable = $dataTable
-            // ->editColumn('updated_at', function ($faq) {
-            //     return getDateColumn($faq, 'updated_at');
-            // })
-            // ->addColumn('action', 'faqs.datatables_actions')
+            ->editColumn('user', function ($query) {
+                return User::find($query->user_id)->name;
+            })
+            ->editColumn('amount', function ($query) {
+                return setting('default_currency') . "  " . Transaction::where('user_id', $query->user_id)->sum('value');
+            })
+            ->addColumn('action', 'wallets.data-table-actions')
             ->rawColumns(array_merge($columns, ['action']));
 
         return $dataTable;
@@ -45,7 +47,7 @@ class WalletDataTable extends DataTable
      */
     public function query(Transaction $model)
     {
-        return $model->newQuery()->with("user")->select('transactions.*');
+        return $model->newQuery()->select('transactions.*')->groupBy('user_id');
     }
 
     /**
@@ -85,35 +87,17 @@ class WalletDataTable extends DataTable
                 'title' => trans('ID'),
 
             ],
-            // [
-            //     'data' => 'answer',
-            //     'title' => trans('lang.faq_answer'),
+            [
+                'data' => 'user',
+                'title' => trans('User Name'),
 
-            // ],
-            // [
-            //     'data' => 'faq_category.name',
-            //     'title' => trans('lang.faq_faq_category_id'),
+            ],
+            [
+                'data' => 'amount',
+                'title' => trans('Current Wallet Amount'),
 
-            // ],
-            // [
-            //     'data' => 'updated_at',
-            //     'title' => trans('lang.faq_updated_at'),
-            //     'searchable' => false,
-            // ]
+            ],
         ];
-
-        // $hasCustomField = in_array(Faq::class, setting('custom_field_models', []));
-        // if ($hasCustomField) {
-        //     $customFieldsCollection = CustomField::where('custom_field_model', Faq::class)->where('in_table', '=', true)->get();
-        //     foreach ($customFieldsCollection as $key => $field) {
-        //         array_splice($columns, $field->order - 1, 0, [[
-        //             'data' => 'custom_fields.' . $field->name . '.view',
-        //             'title' => trans('lang.faq_' . $field->name),
-        //             'orderable' => false,
-        //             'searchable' => false,
-        //         ]]);
-        //     }
-        // }
         return $columns;
     }
 
