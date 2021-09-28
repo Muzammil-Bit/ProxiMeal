@@ -53,6 +53,16 @@ class OrderDataTable extends DataTable
             ->editColumn('active', function ($food) {
                 return getBooleanColumn($food, 'active');
             })
+            ->editColumn('driver', function ($order) {
+                return $order->driver_id != null
+                    ? $order->driver->name
+                    : "<span class='text-danger'>Not Assigned</span>";
+            })
+            ->editColumn('delivered_by', function ($order) {
+                return $order->delivered_by == "single_rider"
+                    ? $order->delivered_by . "(" . $order->order_group_id . ")"
+                    : $order->delivered_by;
+            })
             ->addColumn('action', 'orders.datatables_actions')
             ->rawColumns(array_merge($columns, ['action']));
 
@@ -111,6 +121,16 @@ class OrderDataTable extends DataTable
             [
                 'data' => 'active',
                 'title' => trans('lang.order_active'),
+
+            ],
+            [
+                'data' => 'driver',
+                'title' => trans('Driver'),
+
+            ],
+            [
+                'data' => 'delivered_by',
+                'title' => trans('Delivered By'),
 
             ],
             [

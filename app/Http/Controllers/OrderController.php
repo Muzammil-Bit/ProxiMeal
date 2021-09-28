@@ -191,7 +191,7 @@ class OrderController extends Controller
         }
 
         $restaurant = $order->foodOrders()->first();
-        $restaurant = isset($restaurant) ? $restaurant->food['restaurant_id'] : 0;
+        $restaurant = empty($restaurant) ? $restaurant->food['restaurant_id'] : 0;
 
         $user = $this->userRepository->getByCriteria(new ClientsCriteria())->pluck('name', 'id');
         $driver = $this->userRepository->getByCriteria(new DriversOfRestaurantCriteria($restaurant))->pluck('name', 'id');
@@ -295,20 +295,24 @@ class OrderController extends Controller
         $driverDistances = array();
 
         $order = Order::findOrFail($id);
+        
+        
+        // return $this->sendError("Notification sent.");
+        
         // ** Check if order needs to be assigned
         if ($order->order_status_id != 2 && !isset($status) || $status != 2) {
-            return $this->sendError("Order is not in preparing phase.", 401);
+            return $this->sendError("Order is not in preparing phase.");
         }
-        // // ** Check if the driver is already assigned to the order
-        // if ($order->driver_id == '' || $order->driver_id == null) {
-        //     return Response(['message' => "The Driver is already assigned to the order."], 400);
-        // }
+        // ** Check if the driver is already assigned to the order
+        if ($order->driver_id != '' || $order->driver_id != null) {
+            return $this->sendError("Driver is already assigned to the drriver.");
+        }
 
         $foods = $order->foods;
 
         // Check if order has any foods
         if (sizeof($foods) == 0) {
-            return Response(["message" => "The order has no foods"], 400);
+            return $this->sendError("The order has no foods");
         }
 
 
@@ -329,6 +333,10 @@ class OrderController extends Controller
             }])->get();
         }
 
+        // If there are no active drivers
+        if (sizeof($acitiveDrivers) == 0) {
+            return $this->sendError("There are no active drivers at the moment.");
+        }
 
         // ** Create Array of locations and driver id
         foreach ($acitiveDrivers as $driver) {
@@ -351,25 +359,32 @@ class OrderController extends Controller
         foreach ($driverDistances as $driverDistance) {
             $pendingOrder = PendingOrder::create(['order_id' => $id, 'driver_id' => $driverDistance['driver_id']]);
             
+            Notification::send(User::where('id', $driverDistance['driver_id'])->first(), new AcceptOrRejectOrder($order));
+
             for ($i = 1; $i <= 2; $i++) {
+                
+                
                 sleep(30);
                 $isAccepted = PendingOrder::find($pendingOrder->id);
                 if ($isAccepted->is_accepted == 1) {
                     $driver = $this->userRepository->findWithoutFail($isAccepted->driver_id);
+                    
+                    
                     if (!empty($driver)) {
                         // Actually assign the order
                         if ($order->delivered_by == 'multi_rider') {
-                            $order->driver_id = $driver->user->id;
-                            $pendingOrder->driver_id = $driver->user->id;
+                            $order->driver_id = $driver->id;
+                            $pendingOrder->driver_id = $driver->id;
                             $pendingOrder->is_accepted = 1;
                             $order->save();
                             $pendingOrder->save();
                             $isAssigned = true;
+                            
                             PendingOrder::where('order_id', $order->id)->delete();
                             break;
                         } else if ($order->delivered_by == 'single_rider') {
                             Order::where('order_group_id', $order->order_group_id)->update([
-                                'driver_id' => $driver->user->id,
+                                'driver_id' => $driver->id,
                             ]);
                             $isAssigned = true;
                             PendingOrder::where('order_id', $order->id)->delete();
@@ -377,6 +392,7 @@ class OrderController extends Controller
                         }
                     }
                 } else if ($isAccepted->is_rejected == 0) {
+                    PendingOrder::where('order_id', $order->id)->delete();
                     break;
                 }
             }
@@ -387,7 +403,22 @@ class OrderController extends Controller
                 $pendingOrder->save();
             }
         }
-        return $driverDistances;
+
+        // If driver is still not assigned to the order, Assign it anyway to the first nearest rider.
+        $driver = $this->userRepository->findWithoutFail($driverDistances[0]["driver_id"]);
+        if ($isAssigned == false && $order->delivered_by == "multi_rider") {
+            $order->driver_id = $driver->id;
+            $order->save();
+        } else if ($isAssigned == false && $order->delivered_by == "single_rider") {
+            Order::where('order_group_id', $order->order_group_id)->update([
+                'driver_id' => $driver->id,
+            ]);
+        }
+
+
+        Notification::send(User::where('id', $order->driver_id)->first(), new AssignedOrder($order));
+
+        return Response(['success' => true, 'message' => "The order is assigend to a driver."]);
     }
 
     /**
@@ -436,24 +467,6 @@ class OrderController extends Controller
         }
     }
 
-
-
-
-
-
-
-    // function assignToTheNearestDriver(Request $order)
-    // {
-    //     $allLocations =  Location::with('user')->get();
-    //     $drivers = Driver::with(['user' => function ($q) {
-    //         $q->with('location');
-    //     }])->get();
-
-    //     $distancesFromDriverToLocation = array();
-
-
-    //     return $drivers;
-    // }
 
 
 

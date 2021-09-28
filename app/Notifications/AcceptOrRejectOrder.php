@@ -38,25 +38,26 @@ class AcceptOrRejectOrder extends Notification
         return ['database', 'fcm'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     *
-     * @param mixed $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
-     */
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
-    }
-
+    // /**
+    //  * Get the mail representation of the notification.
+    //  *
+    //  * @param  mixed  $notifiable
+    //  * @return \Illuminate\Notifications\Messages\MailMessage
+    //  */
+    // public function toMail($notifiable)
+    // {
+    //     return (new MailMessage)
+    //                 ->line('The introduction to the notification.')
+    //                 ->action('Notification Action', url('/'))
+    //                 ->line('Thank you for using our application!');
+    // }
+    
+    
     public function toFcm($notifiable)
     {
         $message = new FcmMessage();
         $notification = [
-            'title' => "Order #" . $this->order->id . " of " . $this->order->user->name . " has been assigned to you",
+            'title' => "Order #" . $this->order->id . " has been sent to you. Do you want to accept it?",
             'text'         => $this->order->foodOrders[0]->food->restaurant->name,
             'image' => $this->order->foodOrders[0]->food->restaurant->getFirstMediaUrl('image', 'thumb'),
             'icon' => $this->order->foodOrders[0]->food->restaurant->getFirstMediaUrl('image', 'thumb'),
@@ -71,8 +72,12 @@ class AcceptOrRejectOrder extends Notification
 
         return $message;
     }
+    
+    
+    
+    
 
-    /**
+     /**
      * Get the array representation of the notification.
      *
      * @param mixed $notifiable

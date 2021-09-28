@@ -13,19 +13,18 @@ class PendingOrderController extends Controller
 {
     public function accept($id)
     {
-        
         $pendingOrder = PendingOrder::where('is_accepted', 0)->where('order_id', $id)->first();
-        if ($pendingOrder == null || $pendingOrder == '') {
-            return Response(["message" => "Order Not Found"], 401);
+        if (empty($pendingOrder)) {
+            return $this->sendError("Order not found.");
         }
 
         $pendingOrder->driver_id = auth()->user()->id;
         $pendingOrder->is_accepted = 1;
         $pendingOrder->is_rejected = 0;
-        
+
         $order = Order::where('id', $pendingOrder->order_id)->update([
             'driver_id' => auth()->user()->id,
-            ]);
+        ]);
         $pendingOrder->save();
 
         return $this->sendResponse($order, "Order accepted successfully.");
@@ -35,7 +34,7 @@ class PendingOrderController extends Controller
     {
         $pendingOrder = PendingOrder::where('is_accepted', 0)->where('order_id', $id)->where('is_rejected', 0)->first();
         if ($pendingOrder == null || $pendingOrder == '') {
-            return Response(["message" => "Order Not Found"], 404);
+            return $this->sendError("Order Not Found");
         }
 
         $pendingOrder->is_rejected = 1;
@@ -50,7 +49,7 @@ class PendingOrderController extends Controller
         $user = User::findOrFail($id);
         $pendings = PendingOrder::where('driver_id', $user->id)->where('is_accepted', 0)->where('is_rejected', 0)->get();
         if (count($pendings) == 0) {
-            return Response(["message" => "No new notifications"], 400);
+            return $this->sendError("No new notifications");
         }
 
         $pendingOrders = array();
@@ -59,16 +58,16 @@ class PendingOrderController extends Controller
             $user = User::find($order->user_id);
             $userName = $user->name;
 
-            if(sizeof($order->foods) != 0){
+            if (sizeof($order->foods) != 0) {
                 array_push($pendingOrders, [
-                'order_id' => $order->id,
-                'user_name' => $userName,
-                'delivery_address' => $user->delivery_address,
-                'user_email' => $user->email,
-                'user_lattitude' => $user->location->latitude,
-                'user_longitude' => $user->location->longitude,
-                'restaurant' => $order->foods[0]->restaurant,
-            ]);
+                    'order_id' => $order->id,
+                    'user_name' => $userName,
+                    'delivery_address' => $user->delivery_address,
+                    'user_email' => $user->email,
+                    'user_lattitude' => $user->location->latitude,
+                    'user_longitude' => $user->location->longitude,
+                    'restaurant' => $order->foods[0]->restaurant,
+                ]);
             }
         }
         return $this->sendResponse($pendingOrders, "Notifications retrieved successfully.");

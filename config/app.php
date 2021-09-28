@@ -158,7 +158,7 @@ return [
         Prettus\Repository\Providers\RepositoryServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
         Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
-//        Srmklive\PayPal\Providers\PayPalServiceProvider::class,
+        //        Srmklive\PayPal\Providers\PayPalServiceProvider::class,
         Orangehill\Iseed\IseedServiceProvider::class,
 
         /*
@@ -169,6 +169,9 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+
+        Novatree\Wallet\WalletServiceProvider::class
+
 
 
     ],
@@ -225,7 +228,9 @@ return [
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
         'HTMLFieldGenerator' => InfyOm\Generator\Utils\HTMLFieldGenerator::class,
-//        'PayPal' => Srmklive\PayPal\Facades\PayPal::class,
+
+        'Wallet' => Novatree\Wallet\facades\WalletApiFacades::class
+        //        'PayPal' => Srmklive\PayPal\Facades\PayPal::class,
 
     ],
 

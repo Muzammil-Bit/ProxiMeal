@@ -12,13 +12,13 @@
     </div>
 
     <!-- Driver Id Field -->
-    <div class="form-group row ">
+    {{-- <div class="form-group row ">
         {!! Form::label('driver_id', trans("lang.order_driver_id"),['class' => 'col-3 control-label text-right']) !!}
         <div class="col-9">
             {!! Form::select('driver_id', $driver, null, ['data-empty'=>trans("lang.order_driver_id_placeholder"),'class' => 'select2 not-required form-control']) !!}
             <div class="form-text text-muted">{{ trans("lang.order_driver_id_help") }}</div>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Order Status Id Field -->
     <div class="form-group row ">
@@ -96,7 +96,8 @@
     </div>
 @endif
 <!-- Submit Field -->
-<div class="form-group col-12 text-right">
-    <button type="submit" class="btn btn-{{setting('theme_color')}}" id="btn-submit"><i class="fa fa-save"></i> {{trans('lang.save')}} {{trans('lang.order')}}</button>
+<div class="col-6"><span class="btn btn-warning" id="btn-assign-order"><i class="fa fa-bicycle"></i>{{trans('Assign Order')}}</span></div>
+<div class="form-group col-6 text-right">
+    <button type="submit" class="btn btn-{{setting('theme_color')}}"><i class="fa fa-save"></i> {{trans('lang.save')}} {{trans('lang.order')}}</button>
     <a href="{!! route('orders.index') !!}" class="btn btn-default"><i class="fa fa-undo"></i> {{trans('lang.cancel')}}</a>
 </div>

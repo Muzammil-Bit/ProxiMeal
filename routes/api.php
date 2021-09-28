@@ -42,7 +42,7 @@ Route::post('location/get', "API\LocationController@show");
 Route::post('orders/cost/{id}', 'API\DeliveryCostController@index');
 
 // **Assign Order
-Route::post('orders/assign/{id}/{status?}', 'OrderController@assignOrder');
+Route::post('orders/assign/{id}/{status?}', 'OrderController@assignOrder')->name('orders.assign');
 
 // *************************
 
