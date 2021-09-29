@@ -32,9 +32,10 @@ class WalletDataTable extends DataTable
             })
             ->editColumn('amount', function ($query) {
                 return setting('default_currency') . "  " . Transaction::where('user_id', $query->user_id)->sum('value');
-            })
-            ->addColumn('action', 'wallets.data-table-actions')
-            ->rawColumns(array_merge($columns, ['action']));
+            })->editColumn('action', function ($query) {
+                return $this->actions(User::find($query->user_id)->id);
+            });
+        // ->rawColumns(array_merge($columns, ['action']));
 
         return $dataTable;
     }
@@ -120,5 +121,12 @@ class WalletDataTable extends DataTable
         $data = $this->getDataForPrint();
         $pdf = PDF::loadView($this->printPreview, compact('data'));
         return $pdf->download($this->filename() . '.pdf');
+    }
+    public function actions($id)
+    {
+        return
+            "<a data-toggle='tooltip' data-placement='bottom' href='/wallets/$id/transaction' class='btn btn-link'><i class='fa fa-eye'></i>
+            View All Transactions
+            </a>";
     }
 }

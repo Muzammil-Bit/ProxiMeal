@@ -75,10 +75,12 @@ class WalletController extends Controller
 
 
 
-    public function userTransactions(User $user)
+    public function userTransactions($id)
     {
-        $transactionData = new TransactionsDataTable($user);
-        return $transactionData->render('wallets.index', $user);
+        $transactions = Transaction::where('user_id', $id)->get();
+        return view('wallets.transactions-show')->with([
+            'transactions' => $transactions,
+        ]);
     }
 
     /**

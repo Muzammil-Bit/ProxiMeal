@@ -92,6 +92,8 @@ Route::middleware('auth:api')->group(function () {
             Route::resource('faq_categories', 'API\FaqCategoryAPIController');
             Route::resource('faqs', 'API\FaqAPIController');
             Route::get('extras', 'API\Manager\RestaurantAPIController@getExtras');
+
+            Route::get('earnings', 'API\Manager\EarningAPIController@index');
         });
     });
     Route::post('users/{id}', 'API\UserAPIController@update');
