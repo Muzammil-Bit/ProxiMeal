@@ -298,16 +298,26 @@ class OrderAPIController extends Controller
 
         $oldStatus = $oldOrder->payment->status;
         $input = $request->all();
+        
+        
 
 
         try {
             $order = $this->orderRepository->update($input, $id);
+            
+            if(isset($input['active']) && $input['active'] == 0){
+                $order = $this->orderRepository->update(['order_status_id' => 6], $id);
+            }
+            
             $payment = null;
             if (isset($input['order_status_id']) && $input['order_status_id'] == 5 && !empty($order)) {
                 $payment = $this->paymentRepository->update(['status' => 'Paid'], $order['payment_id']);
             } else {
                 $payment = $this->paymentRepository->find($order['payment_id']);
             }
+            
+            
+            
             event(new OrderChangedEvent($oldStatus, $order));
 
             if (setting('enable_notifications', false)) {

@@ -200,7 +200,7 @@ class UserManagerController extends Controller
         $html = false;
         $role = $this->roleRepository->where('name', 'manager')->pluck('name', 'name');
         $rolesSelected = $user->getRoleNames()->toArray();
-        $vehicle = $this->vehicleRepository->pluck('brand', 'id');
+        $vehicle = $this->vehicleRepository->pluck('type', 'id');
         $customFieldsValues = $user->customFieldsValues()->with('customField')->get();
         $customFields = $this->customFieldRepository->findByField('custom_field_model', $this->userRepository->model());
         $hasCustomField = in_array($this->userRepository->model(), setting('custom_field_models', []));

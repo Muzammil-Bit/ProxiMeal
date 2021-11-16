@@ -51,7 +51,7 @@ class EarningAPIController extends Controller
             $this->restaurantRepository->pushCriteria(new RequestCriteria($request));
             $this->restaurantRepository->pushCriteria(new LimitOffsetCriteria($request));
             $this->restaurantRepository->pushCriteria(new RestaurantsOfManagerCriteria(auth()->id()));
-            $restaurants = $this->restaurantRepository->get('id');
+            $restaurants = $this->restaurantRepository->get(['id', 'name']);
         } catch (RepositoryException $e) {
             return $this->sendError($e->getMessage());
         }
