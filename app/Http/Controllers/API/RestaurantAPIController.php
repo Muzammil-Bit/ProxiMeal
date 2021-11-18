@@ -1,4 +1,5 @@
 <?php
+
 /**
  * File name: RestaurantAPIController.php
  * Last modified: 2020.05.04 at 09:04:19
@@ -20,6 +21,7 @@ use App\Repositories\CustomFieldRepository;
 use App\Repositories\RestaurantRepository;
 use App\Repositories\UploadRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
@@ -51,7 +53,6 @@ class RestaurantAPIController extends Controller
         $this->restaurantRepository = $restaurantRepo;
         $this->customFieldRepository = $customFieldRepo;
         $this->uploadRepository = $uploadRepo;
-
     }
 
     /**
@@ -75,9 +76,13 @@ class RestaurantAPIController extends Controller
             $this->restaurantRepository->pushCriteria(new ActiveCriteria());
             $restaurants = $this->restaurantRepository->all();
 
+            foreach ($restaurants as $restaurant) {
+                $restaurant['closed'] = Restaurant::isOpen($restaurant);
+            }
         } catch (RepositoryException $e) {
             return $this->sendError($e->getMessage());
         }
+
 
         return $this->sendResponse($restaurants->toArray(), 'Restaurants retrieved successfully');
     }
@@ -122,7 +127,7 @@ class RestaurantAPIController extends Controller
      */
     public function store(Request $request)
     {
-        
+
         $input = $request->all();
         if (auth()->user() != null) {
             if (auth()->user()->hasRole('manager')) {
@@ -183,7 +188,7 @@ class RestaurantAPIController extends Controller
 
         return $this->sendResponse($restaurant->toArray(), __('lang.updated_successfully', ['operator' => __('lang.restaurant')]));
     }
-    
+
 
     /**
      * Remove the specified Restaurant from storage.

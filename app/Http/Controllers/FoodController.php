@@ -1,4 +1,5 @@
 <?php
+
 /**
  * File name: FoodController.php
  * Last modified: 2020.04.30 at 08:21:08
@@ -18,6 +19,7 @@ use App\Repositories\CustomFieldRepository;
 use App\Repositories\RestaurantRepository;
 use App\Repositories\FoodRepository;
 use App\Repositories\UploadRepository;
+use Carbon\Carbon;
 use Flash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -47,10 +49,13 @@ class FoodController extends Controller
      */
     private $categoryRepository;
 
-    public function __construct(FoodRepository $foodRepo, CustomFieldRepository $customFieldRepo, UploadRepository $uploadRepo
-        , RestaurantRepository $restaurantRepo
-        , CategoryRepository $categoryRepo)
-    {
+    public function __construct(
+        FoodRepository $foodRepo,
+        CustomFieldRepository $customFieldRepo,
+        UploadRepository $uploadRepo,
+        RestaurantRepository $restaurantRepo,
+        CategoryRepository $categoryRepo
+    ) {
         parent::__construct();
         $this->foodRepository = $foodRepo;
         $this->customFieldRepository = $customFieldRepo;
@@ -202,6 +207,17 @@ class FoodController extends Controller
                 $mediaItem = $cacheUpload->getMedia('image')->first();
                 $mediaItem->copy($food, 'image');
             }
+            //** Update Avalabel Field
+            if (isset($input['unavailable_till'])) {
+                $unavalableTillTime = Carbon::parse(now()->addHours($input['unavailable_till']));
+                $food->unavailable_till = $unavalableTillTime;
+                $food->save();
+            }
+            if (isset($input['food_unavailable']) && $input['food_unavailable'] == 1) {
+                $food->unavailable_till = null;
+                $food->save();
+            }
+
             foreach (getCustomFieldsValues($customFields, $request) as $value) {
                 $food->customFieldsValues()
                     ->updateOrCreate(['custom_field_id' => $value['custom_field_id']], $value);
@@ -237,7 +253,6 @@ class FoodController extends Controller
             $this->foodRepository->delete($id);
 
             Flash::success(__('lang.deleted_successfully', ['operator' => __('lang.food')]));
-
         } else {
             Flash::warning('This is only demo app you can\'t change this section ');
         }

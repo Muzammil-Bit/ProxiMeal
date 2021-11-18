@@ -74,7 +74,31 @@
 {{--dropzone--}}
 <script src="{{asset('plugins/dropzone/dropzone.js')}}"></script>
 <script type="text/javascript">
-    Dropzone.autoDiscover = false;
+  Dropzone.autoDiscover = false;
     var dropzoneFields = [];
+</script>
+
+<script>
+  $(document).ready(function(){
+    $('#food_unavailable').change(function(element){
+      var value = $('#food_unavailable').val();
+      if(value == 1){
+            $('#time-field').html("");
+
+      }else if(value == 0){
+             let label = "<label for='opened_for_hours' class='col-3 control-label text-right'>Unavailable For Hours</label>"
+             $('#time-field').html(label + '<input class="form-control col-9" name="unavailable_till" type="number" id="unavailable_till">')
+      }
+    });
+  //   function changeFoodAvailable(el){
+  //    if(el.value == 0){
+  //      let label = "<label for='opened_for_hours' class='col-3 control-label text-right'>Unavalable For Hours</label>"
+  //      $('time-field').html('<input class="form-control" name="unavailable_till" type="time" id="unavailable_till">')
+  //    }
+  //    if(el.value == 1){
+  //     $('time-field').html("");
+  //    }
+  //  }
+  });
 </script>
 @endpush

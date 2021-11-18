@@ -1,12 +1,15 @@
 @if($customFields)
-    <h5 class="col-12 pb-4">{!! trans('lang.main_fields') !!}</h5>
+<h5 class="col-12 pb-4">{!! trans('lang.main_fields') !!}</h5>
 @endif
+@php
+// dd(Illuminate\Support\Carbon::parse($food->unavailable_till)->toString());
+@endphp
 <div style="flex: 50%;max-width: 50%;padding: 0 4px;" class="column">
     <!-- Name Field -->
     <div class="form-group row ">
         {!! Form::label('name', trans("lang.food_name"), ['class' => 'col-3 control-label text-right']) !!}
         <div class="col-9">
-            {!! Form::text('name', null,  ['class' => 'form-control','placeholder'=>  trans("lang.food_name_placeholder")]) !!}
+            {!! Form::text('name', null, ['class' => 'form-control','placeholder'=> trans("lang.food_name_placeholder")]) !!}
             <div class="form-text text-muted">
                 {{ trans("lang.food_name_help") }}
             </div>
@@ -27,8 +30,8 @@
         </div>
     </div>
     @prepend('scripts')
-        <script type="text/javascript">
-            var var15671147171873255749ble = '';
+    <script type="text/javascript">
+        var var15671147171873255749ble = '';
             @if(isset($food) && $food->hasMedia('image'))
                 var15671147171873255749ble = {
                 name: "{!! $food->getFirstMedia('image')->name !!}",
@@ -69,14 +72,14 @@
                 });
             dz_var15671147171873255749ble[0].mockFile = var15671147171873255749ble;
             dropzoneFields['image'] = dz_var15671147171873255749ble;
-        </script>
-@endprepend
+    </script>
+    @endprepend
 
-<!-- Price Field -->
+    <!-- Price Field -->
     <div class="form-group row ">
         {!! Form::label('price', trans("lang.food_price"), ['class' => 'col-3 control-label text-right']) !!}
         <div class="col-9">
-            {!! Form::number('price', null,  ['class' => 'form-control','placeholder'=>  trans("lang.food_price_placeholder"),'step'=>"any", 'min'=>"0"]) !!}
+            {!! Form::number('price', null, ['class' => 'form-control','placeholder'=> trans("lang.food_price_placeholder"),'step'=>"any", 'min'=>"0"]) !!}
             <div class="form-text text-muted">
                 {{ trans("lang.food_price_help") }}
             </div>
@@ -87,7 +90,7 @@
     <div class="form-group row ">
         {!! Form::label('discount_price', trans("lang.food_discount_price"), ['class' => 'col-3 control-label text-right']) !!}
         <div class="col-9">
-            {!! Form::number('discount_price', null,  ['class' => 'form-control','placeholder'=>  trans("lang.food_discount_price_placeholder"),'step'=>"any", 'min'=>"0"]) !!}
+            {!! Form::number('discount_price', null, ['class' => 'form-control','placeholder'=> trans("lang.food_discount_price_placeholder"),'step'=>"any", 'min'=>"0"]) !!}
             <div class="form-text text-muted">
                 {{ trans("lang.food_discount_price_help") }}
             </div>
@@ -99,7 +102,7 @@
         {!! Form::label('description', trans("lang.food_description"), ['class' => 'col-3 control-label text-right']) !!}
         <div class="col-9">
             {!! Form::textarea('description', null, ['class' => 'form-control','placeholder'=>
-             trans("lang.food_description_placeholder")  ]) !!}
+            trans("lang.food_description_placeholder") ]) !!}
             <div class="form-text text-muted">{{ trans("lang.food_description_help") }}</div>
         </div>
     </div>
@@ -111,7 +114,7 @@
         {!! Form::label('ingredients', trans("lang.food_ingredients"), ['class' => 'col-3 control-label text-right']) !!}
         <div class="col-9">
             {!! Form::textarea('ingredients', null, ['class' => 'form-control','placeholder'=>
-             trans("lang.food_ingredients_placeholder")  ]) !!}
+            trans("lang.food_ingredients_placeholder") ]) !!}
             <div class="form-text text-muted">{{ trans("lang.food_ingredients_help") }}</div>
         </div>
     </div>
@@ -120,7 +123,7 @@
     <div class="form-group row ">
         {!! Form::label('unit', trans("lang.food_unit"), ['class' => 'col-3 control-label text-right']) !!}
         <div class="col-9">
-            {!! Form::text('unit', null,  ['class' => 'form-control','placeholder'=>  trans("lang.food_unit_placeholder")]) !!}
+            {!! Form::text('unit', null, ['class' => 'form-control','placeholder'=> trans("lang.food_unit_placeholder")]) !!}
             <div class="form-text text-muted">
                 {{ trans("lang.food_unit_help") }}
             </div>
@@ -131,7 +134,7 @@
     <div class="form-group row ">
         {!! Form::label('package_items_count', trans("lang.food_package_items_count"), ['class' => 'col-3 control-label text-right']) !!}
         <div class="col-9">
-            {!! Form::number('package_items_count', null,  ['class' => 'form-control','placeholder'=>  trans("lang.food_package_items_count_placeholder"),'step'=>"any", 'min'=>"0"]) !!}
+            {!! Form::number('package_items_count', null, ['class' => 'form-control','placeholder'=> trans("lang.food_package_items_count_placeholder"),'step'=>"any", 'min'=>"0"]) !!}
             <div class="form-text text-muted">
                 {{ trans("lang.food_package_items_count_help") }}
             </div>
@@ -142,7 +145,7 @@
     <div class="form-group row ">
         {!! Form::label('weight', trans("lang.food_weight"), ['class' => 'col-3 control-label text-right']) !!}
         <div class="col-9">
-            {!! Form::number('weight', null,  ['class' => 'form-control','placeholder'=>  trans("lang.food_weight_placeholder"),'step'=>"0.01", 'min'=>"0"]) !!}
+            {!! Form::number('weight', null, ['class' => 'form-control','placeholder'=> trans("lang.food_weight_placeholder"),'step'=>"0.01", 'min'=>"0"]) !!}
             <div class="form-text text-muted">
                 {{ trans("lang.food_weight_help") }}
             </div>
@@ -189,13 +192,34 @@
         </div>
     </div>
 
+    <!-- Food unavailable -->
+    <div class="form-group row ">
+        {!! Form::label('category_id', trans("Food Available"),['class' => 'col-3 control-label text-right']) !!}
+        <div class="col-9">
+            <select name="food_unavailable" id="food_unavailable" class="form-control">
+                <option value="1" {{ App\Models\Food::isAvailable($food->id) ? "selected" : "" }}>Yes</option>
+                <option value="0" {{ App\Models\Food::isAvailable($food->id) ? "" : "selected" }}>No</option>
+            </select>
+        </div>
+    </div>
+
+    @if(! App\Models\Food::isAvailable($food->id))
+    <div class="form-group row ">
+        <p class="text-bold text-right w-100">Food Will be available in {{ App\Models\Food::willBeAvailleAfter($food->id) }}</p>
+    </div>
+    @endif
+
+    <div class="form-group row " id="time-field">
+
+    </div>
+
 </div>
 @if($customFields)
-    <div class="clearfix"></div>
-    <div class="col-12 custom-field-container">
-        <h5 class="col-12 pb-4">{!! trans('lang.custom_field_plural') !!}</h5>
-        {!! $customFields !!}
-    </div>
+<div class="clearfix"></div>
+<div class="col-12 custom-field-container">
+    <h5 class="col-12 pb-4">{!! trans('lang.custom_field_plural') !!}</h5>
+    {!! $customFields !!}
+</div>
 @endif
 <!-- Submit Field -->
 <div class="form-group col-12 text-right">

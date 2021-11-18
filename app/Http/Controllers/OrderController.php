@@ -292,13 +292,15 @@ class OrderController extends Controller
     public function assignOrder($id, $status = null)
     {
         ini_set('max_execution_time', 0);
+        $startTime = now("Asia/Karachi");
+
         $driverDistances = array();
 
         $order = Order::findOrFail($id);
-        
-        
+
+
         // return $this->sendError("Notification sent.");
-        
+
         // ** Check if order needs to be assigned
         if ($order->order_status_id != 2 && !isset($status) || $status != 2) {
             return $this->sendError("Order is not in preparing phase.");
@@ -358,18 +360,18 @@ class OrderController extends Controller
         $isAssigned = false;
         foreach ($driverDistances as $driverDistance) {
             $pendingOrder = PendingOrder::create(['order_id' => $id, 'driver_id' => $driverDistance['driver_id']]);
-            
+
             Notification::send(User::where('id', $driverDistance['driver_id'])->first(), new AcceptOrRejectOrder($order));
 
             for ($i = 1; $i <= 2; $i++) {
-                
-                
+
+
                 sleep(30);
                 $isAccepted = PendingOrder::find($pendingOrder->id);
                 if ($isAccepted->is_accepted == 1) {
                     $driver = $this->userRepository->findWithoutFail($isAccepted->driver_id);
-                    
-                    
+
+
                     if (!empty($driver)) {
                         // Actually assign the order
                         if ($order->delivered_by == 'multi_rider') {
@@ -379,7 +381,7 @@ class OrderController extends Controller
                             $order->save();
                             $pendingOrder->save();
                             $isAssigned = true;
-                            
+
                             PendingOrder::where('order_id', $order->id)->delete();
                             break;
                         } else if ($order->delivered_by == 'single_rider') {

@@ -111,6 +111,23 @@ function getBooleanColumn($column, $attributeName)
     }
 }
 
+
+/**
+ * generate boolean column for datatable
+ * @param $column
+ * @return string
+ */
+function getRestaurantIsOpenColumn($column)
+{
+    if (isset($column)) {
+        if ($column) {
+            return "<span class='badge badge-success'>" . trans('lang.yes') . "</span>";
+        } else {
+            return "<span class='badge badge-danger'>" . trans('lang.no') . "</span>";
+        }
+    }
+}
+
 /**
  * generate not boolean column for datatable
  * @param $column

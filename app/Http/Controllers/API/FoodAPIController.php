@@ -1,4 +1,5 @@
 <?php
+
 /**
  * File name: FoodAPIController.php
  * Last modified: 2020.05.04 at 09:04:19
@@ -44,8 +45,8 @@ class FoodAPIController extends Controller
      * @var UploadRepository
      */
     private $uploadRepository;
-    
-        /**
+
+    /**
      * @var RestaurantRepository
      */
     private $restaurantRepository;
@@ -55,9 +56,13 @@ class FoodAPIController extends Controller
     private $categoryRepository;
 
 
-    public function __construct(FoodRepository $foodRepo, CustomFieldRepository $customFieldRepo, UploadRepository $uploadRepo, RestaurantRepository $restaurantRepo
-        , CategoryRepository $categoryRepo)
-    {
+    public function __construct(
+        FoodRepository $foodRepo,
+        CustomFieldRepository $customFieldRepo,
+        UploadRepository $uploadRepo,
+        RestaurantRepository $restaurantRepo,
+        CategoryRepository $categoryRepo
+    ) {
         parent::__construct();
         $this->foodRepository = $foodRepo;
         $this->customFieldRepository = $customFieldRepo;
@@ -75,7 +80,7 @@ class FoodAPIController extends Controller
      */
     public function index(Request $request)
     {
-        try{
+        try {
             $this->foodRepository->pushCriteria(new RequestCriteria($request));
             $this->foodRepository->pushCriteria(new LimitOffsetCriteria($request));
             $this->foodRepository->pushCriteria(new FoodsOfCuisinesCriteria($request));
@@ -85,18 +90,25 @@ class FoodAPIController extends Controller
                 $this->foodRepository->pushCriteria(new NearCriteria($request));
             }
 
-//            $this->foodRepository->orderBy('closed');
-//            $this->foodRepository->orderBy('area');
+            //            $this->foodRepository->orderBy('closed');
+            //            $this->foodRepository->orderBy('area');
             $foods = $this->foodRepository->all();
 
+            foreach ($foods as $food) {
+                if (!Food::isAvailable($food->id)) {
+                    $food['available_after'] = Food::willBeAvailleAfter($food->id);
+                } else {
+                    $food['available_after'] = null;
+                }
+            }
         } catch (RepositoryException $e) {
             return $this->sendError($e->getMessage());
         }
 
         return $this->sendResponse($foods->toArray(), 'Foods retrieved successfully');
     }
-    
-     /**
+
+    /**
      * Show the form for creating a new Food.
      *
      * @return Response
@@ -127,14 +139,13 @@ class FoodAPIController extends Controller
      */
     public function categories(Request $request)
     {
-        try{
+        try {
             $this->foodRepository->pushCriteria(new RequestCriteria($request));
             $this->foodRepository->pushCriteria(new LimitOffsetCriteria($request));
             $this->foodRepository->pushCriteria(new FoodsOfCuisinesCriteria($request));
             $this->foodRepository->pushCriteria(new FoodsOfCategoriesCriteria($request));
 
             $foods = $this->foodRepository->all();
-
         } catch (RepositoryException $e) {
             return $this->sendError($e->getMessage());
         }
@@ -154,7 +165,7 @@ class FoodAPIController extends Controller
     {
         /** @var Food $food */
         if (!empty($this->foodRepository)) {
-            try{
+            try {
                 $this->foodRepository->pushCriteria(new RequestCriteria($request));
                 $this->foodRepository->pushCriteria(new LimitOffsetCriteria($request));
             } catch (RepositoryException $e) {
@@ -230,7 +241,6 @@ class FoodAPIController extends Controller
         }
 
         return $this->sendResponse($food->toArray(), __('lang.updated_successfully', ['operator' => __('lang.food')]));
-
     }
 
     /**
@@ -251,7 +261,5 @@ class FoodAPIController extends Controller
         $food = $this->foodRepository->delete($id);
 
         return $this->sendResponse($food, __('lang.deleted_successfully', ['operator' => __('lang.food')]));
-
     }
-
 }

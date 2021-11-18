@@ -9,7 +9,9 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Eloquent as Model;
+use phpDocumentor\Reflection\Types\Self_;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
@@ -153,6 +155,29 @@ class Food extends Model implements HasMedia
     public function customFieldsValues()
     {
         return $this->morphMany('App\Models\CustomFieldValue', 'customizable');
+    }
+
+
+    public static function isAvailable($id)
+    {
+        $food = Self::findOrFail($id);
+        if ($food->unavailable_till == null || Carbon::parse($food->unavailable_till)->isPast()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static function willBeAvailleAfter($id)
+    {
+        $food = Self::findOrFail($id);
+        $hours = Carbon::parse($food->unavailable_till)->diffInHours(now());
+        if ($hours == 0) {
+            $minutes = Carbon::parse($food->unavailable_till)->diffInMinutes(now());
+        }
+
+        return isset($minutes)
+            ? $minutes . " minutes"
+            : $hours . " hours";
     }
 
     /**
